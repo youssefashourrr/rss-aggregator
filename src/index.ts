@@ -4,9 +4,12 @@ import {
     runCommand 
 } from "./commands/cmds";
 import { handlerLogin } from "./commands/login";
+import { handlerRegister } from "./commands/register";
+import { handlerReset } from "./commands/reset";
+import { handlerUsers } from "./commands/users";
 
 
-function main() {
+async function main() {
   	const args = process.argv.slice(2);
 	if (args.length < 1) {
 		console.log("usage: cli <command> [args...]");
@@ -18,9 +21,12 @@ function main() {
 	const commandsRegistry: CommandsRegistry = {};
 
 	registerCommand(commandsRegistry, "login", handlerLogin);
-
+	registerCommand(commandsRegistry, "register", handlerRegister);
+	registerCommand(commandsRegistry, "reset", handlerReset);
+	registerCommand(commandsRegistry, "users", handlerUsers);
+	
 	try {
-		runCommand(commandsRegistry, cmdName, ...cmdArgs);
+		await runCommand(commandsRegistry, cmdName, ...cmdArgs);
 	} catch (err) {
 		if (err instanceof Error) {
 		console.error(`Error running command ${cmdName}: ${err.message}`);
@@ -29,6 +35,8 @@ function main() {
 		}
 		process.exit(1);
 	}
+
+	process.exit(0);
 }
 
 main();
