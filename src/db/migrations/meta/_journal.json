@@ -8,6 +8,13 @@
       "when": 1763912446819,
       "tag": "0000_orange_valeria_richards",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1764088748405,
+      "tag": "0001_living_slyde",
+      "breakpoints": true
     }
   ]
 }

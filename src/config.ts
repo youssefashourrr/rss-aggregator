@@ -17,13 +17,13 @@ export function setUser(userName: string): void {
 
 function validateConfig(rawConfig: any): Config {
 	if (!rawConfig.db_url || typeof rawConfig.db_url !== "string") {
-		throw new Error("db_url is required in config file");
+		throw new Error("Missing db_url in config");
 	}
 	if (
 		!rawConfig.current_user_name ||
 		typeof rawConfig.current_user_name !== "string"
 	) {
-		throw new Error("current_user_name is required in config file");
+		throw new Error("Missing current_user_name in config");
 	}
 
 	const config: Config = {

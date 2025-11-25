@@ -1,4 +1,4 @@
-import { eq, lt, gte, ne } from 'drizzle-orm';
+import { eq, gte, lt, ne } from 'drizzle-orm';
 
 import { db } from "..";
 import { users } from "../schema";
@@ -15,6 +15,10 @@ export async function getAllUsers() {
 
 export async function getUserByName(name: string) {
     return await db.select().from(users).where(eq(users.name, name));
+}
+
+export async function getUserById(id: string) {
+    return await db.select().from(users).where(eq(users.id, id));
 }
 
 export async function reset() {
