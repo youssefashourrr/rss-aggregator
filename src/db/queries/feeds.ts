@@ -1,13 +1,18 @@
-import { db } from "..";
-import { feeds, users } from "../schema";
+import { eq } from 'drizzle-orm';
+
+import { db } from "src/db/index";
+import { feeds, users } from "src/db/schema";
 
 
 export async function createFeed(name: string, url: string, userId: string) {
-	const [result] = await db.insert(feeds).values({ name: name, url: url, user_id: userId }).returning();
-	return result;
+	const [newFeed] = await db.insert(feeds).values({ name, url, userId }).returning();
+	return newFeed;
 }
 
-
 export async function getAllFeeds() {
-    return await db.select({ name: feeds.name, url: feeds.url, userId: feeds.user_id }).from(feeds);
+    return await db.select().from(feeds);
+}
+
+export async function getFeedByUrl(url: string) {
+	return await db.select().from(feeds).where(eq(feeds.url, url));
 }

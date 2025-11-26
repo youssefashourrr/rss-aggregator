@@ -2,17 +2,18 @@ import {
     CommandsRegistry, 
     registerCommand, 
     runCommand 
-} from "./commands/cmds";
-import { handlerAgg } from "./commands/aggregate";
-import { handlerAddFeed, handlerListFeeds } from "./commands/feeds";
-import { handlerReset } from "./commands/reset";
-import { handlerLogin, handlerRegister, handlerListUsers } from "./commands/users";
+} from "src/commands/cmds";
+import { handlerAgg } from "src/commands/aggregate";
+import { handlerAddFeed, handlerListFeeds } from "src/commands/feeds";
+import { handlerReset } from "src/commands/reset";
+import { handlerLogin, handlerRegister, handlerListUsers } from "src/commands/users";
+import { handlerFollow, handlerListFollows } from "src/commands/follows";
 
 
 async function main() {
   	const args = process.argv.slice(2);
 	if (args.length < 1) {
-		console.log("Usage: cli <command> [args...]");
+		console.log("usage: cli <command> [args...]");
 		process.exit(1);
 	}
 
@@ -27,14 +28,16 @@ async function main() {
 	registerCommand(commandsRegistry, "agg", handlerAgg);
 	registerCommand(commandsRegistry, "addfeed", handlerAddFeed);
 	registerCommand(commandsRegistry, "feeds", handlerListFeeds);
+	registerCommand(commandsRegistry, "follow", handlerFollow);
+	registerCommand(commandsRegistry, "following", handlerListFollows);
 	
 	try {
 		await runCommand(commandsRegistry, cmdName, ...cmdArgs);
 	} catch (err) {
 		if (err instanceof Error) {
-		console.error(`Error: ${err.message}`);
+		console.error(err.message);
 		} else {
-		console.error(`Error: ${err}`);
+		console.error(String(err));
 		}
 		process.exit(1);
 	}

@@ -1,16 +1,16 @@
-import { eq, gte, lt, ne } from 'drizzle-orm';
+import { eq } from 'drizzle-orm';
 
-import { db } from "..";
-import { users } from "../schema";
+import { db } from "src/db/index";
+import { users } from "src/db/schema";
 
 
 export async function createUser(name: string) {
-  const [result] = await db.insert(users).values({ name: name }).returning();
-  return result;
+    const [newUser] = await db.insert(users).values({ name }).returning();
+    return newUser;
 }
 
 export async function getAllUsers() {
-    return await db.select({ name: users.name }).from(users);
+    return await db.select().from(users);
 }
 
 export async function getUserByName(name: string) {

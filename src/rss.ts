@@ -26,7 +26,7 @@ export async function fetchFeed(feedURL: string) {
     	},
   	});
   	if (!response.ok) {
-    	throw new Error(`Failed to fetch feed: ${response.status}`);
+    	throw new Error(`failed to fetch feed: ${response.status}`);
   	}
 
   	const xml = await response.text();
@@ -35,7 +35,7 @@ export async function fetchFeed(feedURL: string) {
 
   	const channel = result.rss?.channel;
   	if (!channel) {
-    	throw new Error("Invalid feed format");
+    	throw new Error("invalid feed format");
   	}
 
   	if (
@@ -45,7 +45,7 @@ export async function fetchFeed(feedURL: string) {
     	!channel.description ||
     	!channel.item
   	) {
-    throw new Error("Invalid feed format");
+    throw new Error("invalid feed format");
   	}
 
   	const items: any[] = Array.isArray(channel.item) ? channel.item : [channel.item];

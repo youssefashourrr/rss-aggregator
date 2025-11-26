@@ -1,7 +1,7 @@
-import { reset } from "../db/queries/users";
+import { reset } from "src/db/queries/users";
 
 
 export async function handlerReset(cmdName: string, ...args: string[]): Promise<void> {
     await reset();
-    console.log(`Database reset`);
+    console.log(`database reset`);
 }

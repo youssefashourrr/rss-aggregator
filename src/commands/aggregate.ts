@@ -1,4 +1,4 @@
-import { fetchFeed } from "../rss";
+import { fetchFeed } from "src/rss";
 
 
 export async function handlerAgg(_: string) {
