@@ -8,9 +8,14 @@ type Config = {
   	currentUserName: string;
 };
 
+type RawConfig = {
+	db_url: string;
+	current_user_name: string;
+};
+
 
 export function setUser(userName: string): void {
-	const config = readConfig();
+	const config: Config = readConfig();
 	config.currentUserName = userName;
 	writeConfig(config);
 }
@@ -35,28 +40,28 @@ function validateConfig(rawConfig: any): Config {
 }
 
 export function readConfig(): Config {
-	const fullPath = getConfigFilePath();
+	const fullPath: string = getConfigFilePath();
 
-	const data = fs.readFileSync(fullPath, "utf-8");
-	const rawConfig = JSON.parse(data);
+	const data: string = fs.readFileSync(fullPath, "utf-8");
+	const rawConfig: any = JSON.parse(data);
 
 	return validateConfig(rawConfig);
 }
 
 function getConfigFilePath(): string {
-    const configFileName = ".gatorconfig.json";
-	const homeDir = os.homedir();
+    const configFileName: string = ".gatorconfig.json";
+	const homeDir: string = os.homedir();
 	return path.join(homeDir, configFileName);
 }
 
 function writeConfig(config: Config): void {
-	const fullPath = getConfigFilePath();
+	const fullPath: string = getConfigFilePath();
 
-	const rawConfig = {
+	const rawConfig: RawConfig = {
 		db_url: config.dbUrl,
 		current_user_name: config.currentUserName,
 	};
 
-	const data = JSON.stringify(rawConfig, null, 2);
+	const data: string = JSON.stringify(rawConfig, null, 2);
 	fs.writeFileSync(fullPath, data, { encoding: "utf-8" });
 }

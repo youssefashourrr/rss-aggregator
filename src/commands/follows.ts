@@ -1,31 +1,37 @@
-import { createFeedFollow, getFeedFollowsForUser } from "src/db/queries/follows";
-import { getFeedByUrl } from "src/db/queries/feeds";
-import { getUserByName } from "src/db/queries/users";
-import { readConfig } from "src/config";
+import { createFeedFollow, getFeedFollowsForUser, unfolllow } from "../db/queries/follows";
+import { getFeedByUrl } from "../db/queries/feeds";
+import { User, Feed } from "../db/schema";
 
 
-export async function handlerFollow(cmdName: string, ...args: string[]): Promise<void> {
-    if (args.length < 1) {
+export async function handlerFollow(cmdName: string, user: User, ...args: string[]): Promise<void> {
+    if (args.length !== 1) {
         throw new Error(`usage: ${cmdName} <url>`);
     }
 
-    const url = args[0];
-    const current = readConfig().currentUserName;
+    const url: string = args[0];
+    const feed: Feed | null = await getFeedByUrl(url);
+    if (!feed) {
+        throw new Error("feed not found");
+    }
 
-    const user = (await getUserByName(current))[0];
-    const feed = (await getFeedByUrl(url))[0];
-
-    const newFeedFollow = await createFeedFollow(user.id, feed.id);
-    console.log(`following ${feed.name}`);
+    await createFeedFollow(user.id, feed.id);
+    console.log(`following: ${feed.name}`);
 }
 
-export async function handlerListFollows(cmdName: string, ...args: string[]): Promise<void> {
-    const current = readConfig().currentUserName;
-
-    const user = (await getUserByName(current))[0];
+export async function handlerListFollows(_: string, user: User): Promise<void> {
     const feedFollows = await getFeedFollowsForUser(user.id);
 
     for (const follow of feedFollows) {
         console.log(`* ${follow.feedName}`)
     }
+}
+
+export async function handlerUnfollow(cmdName: string, user: User, ...args: string[]): Promise<void> {
+    if (args.length !== 1) {
+        throw new Error(`usage: ${cmdName} <url>`);
+    }
+
+    const url: string = args[0];
+    await unfolllow(url, user.id);
+    console.log(`unfollowed: ${url}`);
 }

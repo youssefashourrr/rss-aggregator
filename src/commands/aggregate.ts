@@ -1,10 +1,10 @@
-import { fetchFeed } from "src/rss";
+import { RSSFeed, fetchFeed } from "../rss";
 
+  
+export async function handlerAgg(_: string): Promise<void> {
+  const feedURL: string = "https://www.wagslane.dev/index.xml";
 
-export async function handlerAgg(_: string) {
-  const feedURL = "https://www.wagslane.dev/index.xml";
-
-  const feedData = await fetchFeed(feedURL);
-  const feedDataStr = JSON.stringify(feedData, null, 2);
+  const feedData: RSSFeed = await fetchFeed(feedURL);
+  const feedDataStr: string = JSON.stringify(feedData, null, 2);
   console.log(feedDataStr);
 }

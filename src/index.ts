@@ -2,23 +2,24 @@ import {
     CommandsRegistry, 
     registerCommand, 
     runCommand 
-} from "src/commands/cmds";
-import { handlerAgg } from "src/commands/aggregate";
-import { handlerAddFeed, handlerListFeeds } from "src/commands/feeds";
-import { handlerReset } from "src/commands/reset";
-import { handlerLogin, handlerRegister, handlerListUsers } from "src/commands/users";
-import { handlerFollow, handlerListFollows } from "src/commands/follows";
+} from "./commands/cmds";
+import { handlerAgg } from "./commands/aggregate";
+import { handlerAddFeed, handlerListFeeds } from "./commands/feeds";
+import { handlerReset } from "./commands/reset";
+import { handlerLogin, handlerRegister, handlerListUsers } from "./commands/users";
+import { handlerFollow, handlerListFollows, handlerUnfollow } from "./commands/follows";
+import { middlewareLoggedIn } from "./middleware";
 
 
-async function main() {
-  	const args = process.argv.slice(2);
+async function main(): Promise<void> {
+  	const args: string[] = process.argv.slice(2);
 	if (args.length < 1) {
 		console.log("usage: cli <command> [args...]");
 		process.exit(1);
 	}
 
-	const cmdName = args[0];
-	const cmdArgs = args.slice(1);
+	const cmdName: string = args[0];
+	const cmdArgs: string[] = args.slice(1);
 	const commandsRegistry: CommandsRegistry = {};
 
 	registerCommand(commandsRegistry, "login", handlerLogin);
@@ -26,10 +27,11 @@ async function main() {
 	registerCommand(commandsRegistry, "reset", handlerReset);
 	registerCommand(commandsRegistry, "users", handlerListUsers);
 	registerCommand(commandsRegistry, "agg", handlerAgg);
-	registerCommand(commandsRegistry, "addfeed", handlerAddFeed);
+	registerCommand(commandsRegistry, "addfeed", middlewareLoggedIn(handlerAddFeed));
 	registerCommand(commandsRegistry, "feeds", handlerListFeeds);
-	registerCommand(commandsRegistry, "follow", handlerFollow);
-	registerCommand(commandsRegistry, "following", handlerListFollows);
+	registerCommand(commandsRegistry, "follow", middlewareLoggedIn(handlerFollow));
+	registerCommand(commandsRegistry, "following", middlewareLoggedIn(handlerListFollows));
+	registerCommand(commandsRegistry, "unfollow", middlewareLoggedIn(handlerUnfollow));
 	
 	try {
 		await runCommand(commandsRegistry, cmdName, ...cmdArgs);

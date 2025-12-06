@@ -18,7 +18,7 @@ export type RSSItem = {
 };
 
 
-export async function fetchFeed(feedURL: string) {
+export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
   	const response = await fetch(feedURL, {
     	headers: {
       		"User-Agent": "gator",
@@ -29,11 +29,11 @@ export async function fetchFeed(feedURL: string) {
     	throw new Error(`failed to fetch feed: ${response.status}`);
   	}
 
-  	const xml = await response.text();
-  	const parser = new XMLParser();
-  	let result = parser.parse(xml);
+  	const xml: string = await response.text();
+  	const parser: XMLParser = new XMLParser();
+  	let result: any = parser.parse(xml);
 
-  	const channel = result.rss?.channel;
+  	const channel: any = result.rss?.channel;
   	if (!channel) {
     	throw new Error("invalid feed format");
   	}

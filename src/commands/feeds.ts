@@ -1,26 +1,28 @@
-import { readConfig } from "src/config";
-import { createFeed, getAllFeeds } from "src/db/queries/feeds";
-import { createFeedFollow } from "src/db/queries/follows";
-import { getUserById, getUserByName } from "src/db/queries/users";
+import { User, Feed } from "src/db/schema";
+import { createFeed, getAllFeeds } from "../db/queries/feeds";
+import { createFeedFollow } from "../db/queries/follows";
+import { getUserById } from "../db/queries/users";
 
 
-export async function handlerAddFeed(cmdName: string, ...args: string[]): Promise<void> {
-    if (args.length < 2) {
+export async function handlerAddFeed(cmdName: string, user: User, ...args: string[]): Promise<void> {
+    if (args.length !== 2) {
         throw new Error(`usage: ${cmdName} <name> <url>`);
     }
 
-    const current = readConfig().currentUserName;
-    const user = (await getUserByName(current))[0];
-
-    const newFeed = await createFeed(args[0], args[1], user.id);
+    const name: string = args[0];
+    const url: string = args[1];
+    const newFeed: Feed = await createFeed(name, url, user.id);
+    
     await createFeedFollow(user.id, newFeed.id);
-    console.log(`feed added: ${newFeed.name}`);
+    console.log(`feed created: ${newFeed.name}`);
 }
 
 export async function handlerListFeeds(cmdName: string, ...args: string[]): Promise<void> {
-    const allFeeds = await getAllFeeds();
+    const allFeeds: Feed[] = await getAllFeeds();
     for (const feed of allFeeds) {
-        const user = await getUserById(feed.userId);
-        console.log(`* ${feed.name} (${feed.url}) - ${user[0].name}`);
+        const user: User | null = await getUserById(feed.userId);
+        if (user) {
+            console.log(`* ${feed.name} (${feed.url}) - ${user.name}`);
+        }
     }
 }
