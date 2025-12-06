@@ -16,7 +16,10 @@ type FeedFollowWithDetails = {
 
 
 export async function createFeedFollow(userId: string, feedId: string): Promise<FeedFollowWithDetails> {
-    const [newFeedFollow] = await db.insert(feed_follows).values({userId, feedId}).returning();
+    const [newFeedFollow] = await db
+		.insert(feed_follows)
+		.values({ userId, feedId })
+		.returning();
     
     const result: FeedFollowWithDetails[] = await db
         .select({

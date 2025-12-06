@@ -1,7 +1,7 @@
 import type { CommandHandler, UserCommandHandler } from "./commands/cmds";
 import { readConfig } from "./config";
 import { getUserByName } from "./db/queries/users";
-import { User } from "./db/schema";
+import type { User } from "./db/schema";
 
 
 export function middlewareLoggedIn(handler: UserCommandHandler): CommandHandler {

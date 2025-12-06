@@ -1,6 +1,6 @@
 import { createUser, getAllUsers, getUserByName } from "../db/queries/users";
 import { readConfig, setUser } from "../config";
-import { User } from "../db/schema";
+import type { User } from "../db/schema";
 
 
 export async function handlerRegister(cmdName: string, ...args: string[]): Promise<void> {

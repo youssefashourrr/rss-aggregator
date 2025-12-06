@@ -1,4 +1,4 @@
-import { User, Feed } from "src/db/schema";
+import type { User, Feed } from "src/db/schema";
 import { createFeed, getAllFeeds } from "../db/queries/feeds";
 import { createFeedFollow } from "../db/queries/follows";
 import { getUserById } from "../db/queries/users";
