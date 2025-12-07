@@ -1,21 +1,19 @@
-import { 
-    CommandsRegistry, 
-    registerCommand, 
-    runCommand 
-} from "./commands/cmds";
 import { handlerAgg } from "./commands/aggregate";
+import { handlerBrowse } from "./commands/browse";
+import { registerCommand, runCommand } from "./commands/cmds";
 import { handlerAddFeed, handlerListFeeds } from "./commands/feeds";
+import { handlerFollow, handlerListFollows, handlerUnfollow } from "./commands/follows";
 import { handlerReset } from "./commands/reset";
 import { handlerLogin, handlerRegister, handlerListUsers } from "./commands/users";
-import { handlerFollow, handlerListFollows, handlerUnfollow } from "./commands/follows";
-import { handlerBrowse } from "./commands/browse";
 import { middlewareLoggedIn } from "./middleware";
+
+import type { CommandsRegistry } from "./commands/cmds";
 
 
 async function main(): Promise<void> {
   	const args: string[] = process.argv.slice(2);
 	if (args.length < 1) {
-		console.log("usage: cli <command> [args...]");
+		console.log("usage: gator <command> [args]");
 		process.exit(1);
 	}
 

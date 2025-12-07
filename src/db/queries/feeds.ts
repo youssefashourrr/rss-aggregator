@@ -1,11 +1,13 @@
-import { eq, sql } from 'drizzle-orm';
+import { eq, sql } from "drizzle-orm";
 
 import { db } from "../index";
-import { feeds, Feed } from "../schema";
+import { feeds } from "../schema";
+
+import type { Feed } from "../schema";
 
 
 export async function createFeed(name: string, url: string, userId: string): Promise<Feed> {
-	const [result] = await db
+	const [result]: Feed[] = await db
 		.insert(feeds)
 		.values({ name, url, userId })
 		.returning();
@@ -23,7 +25,7 @@ export async function getFeedByUrl(url: string): Promise<Feed | null> {
 		.select()
 		.from(feeds)
 		.where(eq(feeds.url, url));
-	return result[0] || null;
+	return result[0] ?? null;
 }
 
 export async function markFeedFetched(id: string): Promise<void> {
@@ -37,6 +39,6 @@ export async function getNextFeedToFetch(): Promise<Feed | null> {
 	const result: Feed[] = await db.execute(sql`
 		SELECT *
 		FROM feeds
-		ORDER BY last_fetched_at NULLS FIRST`)
-	return result[0] || null;
+		ORDER BY last_fetched_at NULLS FIRST`);
+	return result[0] ?? null;
 }

@@ -1,6 +1,7 @@
-import type { User, Feed } from "../db/schema";
-import { createFeedFollow, getFeedFollowsForUser, unfolllow } from "../db/queries/follows";
 import { getFeedByUrl } from "../db/queries/feeds";
+import { createFeedFollow, getFeedFollowsForUser, unfolllow } from "../db/queries/follows";
+
+import type { Feed, User } from "../db/schema";
 
 
 export async function handlerFollow(cmdName: string, user: User, ...args: string[]): Promise<void> {
@@ -11,18 +12,18 @@ export async function handlerFollow(cmdName: string, user: User, ...args: string
     const url: string = args[0];
     const feed: Feed | null = await getFeedByUrl(url);
     if (!feed) {
-        throw new Error("feed not found");
+        throw new Error(`feed not found: ${url}`);
     }
 
     await createFeedFollow(user.id, feed.id);
-    console.log(`following: ${feed.name}`);
+    console.log(`followed: ${feed.name}`);
 }
 
 export async function handlerListFollows(_: string, user: User): Promise<void> {
     const feedFollows = await getFeedFollowsForUser(user.id);
 
     for (const follow of feedFollows) {
-        console.log(`* ${follow.feedName}`)
+        console.log(`* ${follow.feedName}`);
     }
 }
 

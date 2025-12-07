@@ -1,4 +1,4 @@
-import { pgTable, text, timestamp, uuid, unique } from "drizzle-orm/pg-core";
+import { pgTable, text, timestamp, unique, uuid } from "drizzle-orm/pg-core";
 
 
 export const users = pgTable("users", {
@@ -29,6 +29,7 @@ export const feedFollows = pgTable("feed_follows", {
 }, (table) => [
 	unique().on(table.userId, table.feedId),
 ]);
+export type FeedFollow = typeof feedFollows.$inferSelect;
 
 export const posts = pgTable("posts", {
     id: uuid("id").primaryKey().defaultRandom().notNull(),

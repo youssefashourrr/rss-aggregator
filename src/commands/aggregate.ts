@@ -6,38 +6,37 @@ export async function handlerAgg(cmdName: string, ...args: string[]): Promise<vo
 		throw new Error(`usage: ${cmdName} <delay>`);
 	}
 
-	const timeArg = args[0];
-	const delay = parseDuration(timeArg);
+	const timeArg: string = args[0];
+	const delay: number = parseDuration(timeArg);
 	if (!delay) {
-    	throw new Error(
-			`invalid duration: ${timeArg} — use format 1h 30m 15s or 3500ms`);
+    	throw new Error(`invalid duration: ${timeArg}`);
   	}
 	console.log(`collecting feeds every ${timeArg}`);
 
 	scrapFeeds().catch(handleError);
-	const intervalId = setInterval(() => {
+	const intervalId: NodeJS.Timeout = setInterval(() => {
 		scrapFeeds().catch(handleError);
 	}, delay);
 
-	return new Promise<void>((resolve) => {
+	return new Promise<void>((resolve: () => void) => {
 		process.on("SIGINT", () => {
 			clearInterval(intervalId);
-			console.log("\nstopping feed aggregation...");
+			console.log("\nstopping aggregation");
 			resolve();
 		});
 	});
 }
 
 function parseDuration(durationStr: string): number {
-	const regex = /^(\d+)(ms|s|m|h)$/;
-	const match = durationStr.match(regex);
+	const regex: RegExp = /^(\d+)(ms|s|m|h)$/;
+	const match: RegExpMatchArray | null = durationStr.match(regex);
 
 	if (!match) {
-		throw new Error(`invalid duration format`);
+		throw new Error("invalid duration format");
 	}
 
-	const value = parseInt(match[1], 10);
-	const unit = match[2];
+	const value: number = parseInt(match[1], 10);
+	const unit: string = match[2];
 
 	switch (unit) {
 		case "ms":
@@ -49,10 +48,10 @@ function parseDuration(durationStr: string): number {
 		case "h":
 			return value * 1000 * 60 * 60;
 		default:
-			throw new Error(`unknown duration unit: ${unit}`);
+			throw new Error(`unknown unit: ${unit}`);
 	}
 }
 
 function handleError(error: unknown): void {
-	console.error(`error scraping feeds: ${error instanceof Error ? error.message : String(error)}`);
+	console.error(`scrape error: ${error instanceof Error ? error.message : String(error)}`);
 }

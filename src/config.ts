@@ -1,16 +1,16 @@
-import fs from "fs";
-import os from "os";
-import path from "path";
+import fs from "node:fs";
+import os from "node:os";
+import path from "node:path";
 
 
-type Config = {
+export type Config = {
   	dbUrl: string;
   	currentUserName: string;
 };
 
-type RawConfig = {
-	db_url: string;
-	current_user_name: string;
+type PartialRawConfig = {
+	db_url?: unknown;
+	current_user_name?: unknown;
 };
 
 
@@ -20,15 +20,15 @@ export function setUser(userName: string): void {
 	writeConfig(config);
 }
 
-function validateConfig(rawConfig: any): Config {
+function validateConfig(rawConfig: PartialRawConfig): Config {
 	if (!rawConfig.db_url || typeof rawConfig.db_url !== "string") {
-		throw new Error("missing db_url in config");
+		throw new Error("config missing: db_url");
 	}
 	if (
 		!rawConfig.current_user_name ||
 		typeof rawConfig.current_user_name !== "string"
 	) {
-		throw new Error("missing current_user_name in config");
+		throw new Error("config missing: current_user_name");
 	}
 
 	const config: Config = {
@@ -43,7 +43,7 @@ export function readConfig(): Config {
 	const fullPath: string = getConfigFilePath();
 
 	const data: string = fs.readFileSync(fullPath, "utf-8");
-	const rawConfig: any = JSON.parse(data);
+	const rawConfig: PartialRawConfig = JSON.parse(data) as PartialRawConfig;
 
 	return validateConfig(rawConfig);
 }
@@ -57,9 +57,9 @@ function getConfigFilePath(): string {
 function writeConfig(config: Config): void {
 	const fullPath: string = getConfigFilePath();
 
-	const rawConfig: RawConfig = {
-		db_url: config.dbUrl,
-		current_user_name: config.currentUserName,
+	const rawConfig: Config = {
+		dbUrl: config.dbUrl,
+		currentUserName: config.currentUserName,
 	};
 
 	const data: string = JSON.stringify(rawConfig, null, 2);

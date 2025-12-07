@@ -3,6 +3,8 @@ import { and, eq } from "drizzle-orm";
 import { db } from "../index";
 import { feedFollows, feeds, users } from "../schema";
 
+import type { FeedFollow } from "../schema";
+
 
 type FeedFollowWithDetails = {
     id: string;
@@ -16,7 +18,7 @@ type FeedFollowWithDetails = {
 
 
 export async function createFeedFollow(userId: string, feedId: string): Promise<FeedFollowWithDetails> {
-    const [newFeedFollow] = await db
+    const [newFeedFollow]: FeedFollow[] = await db
 		.insert(feedFollows)
 		.values({ userId, feedId })
 		.returning();
@@ -64,7 +66,7 @@ export async function unfolllow(url: string, userId: string): Promise<void> {
 
     const feedId: string | undefined = feedResult[0]?.id;
     if (!feedId) {
-        throw new Error("feed not found");
+        throw new Error(`feed not found: ${url}`);
     }
 
     await db

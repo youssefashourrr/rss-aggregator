@@ -1,7 +1,8 @@
-import type { User, Feed } from "src/db/schema";
 import { createFeed, getAllFeeds } from "../db/queries/feeds";
 import { createFeedFollow } from "../db/queries/follows";
 import { getUserById } from "../db/queries/users";
+
+import type { Feed, User } from "../db/schema";
 
 
 export async function handlerAddFeed(cmdName: string, user: User, ...args: string[]): Promise<void> {
@@ -14,7 +15,7 @@ export async function handlerAddFeed(cmdName: string, user: User, ...args: strin
     const newFeed: Feed = await createFeed(name, url, user.id);
     
     await createFeedFollow(user.id, newFeed.id);
-    console.log(`feed created: ${newFeed.name}`);
+    console.log(`created feed: ${newFeed.name}`);
 }
 
 export async function handlerListFeeds(cmdName: string, ...args: string[]): Promise<void> {

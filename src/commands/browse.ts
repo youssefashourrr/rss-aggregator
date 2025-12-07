@@ -1,10 +1,12 @@
-import type { User } from "../db/schema";
 import { getPostsForUsers } from "../db/queries/posts";
 
+import type { Post, User } from "../db/schema";
+
+
 export async function handlerBrowse(cmdName: string, user: User, ...args: string[]): Promise<void> {
-    let limit = 2;
+    let limit: number = 2;
     if (args.length === 1) {
-        const inputLimit = parseInt(args[0]);
+        const inputLimit: number = parseInt(args[0], 10);
         if (!Number.isNaN(inputLimit)) {
             limit = inputLimit;
         } else {
@@ -12,14 +14,14 @@ export async function handlerBrowse(cmdName: string, user: User, ...args: string
         }
     }
 
-    const posts = await getPostsForUsers(user.id, limit);
+    const posts: Post[] = await getPostsForUsers(user.id, limit);
 
-    console.log(`Found ${posts.length} posts for user ${user.name}`);
-    for (let post of posts) {
-        console.log(`${post.publishedAt}`);
-        console.log(`--- ${post.title} ---`);
-        console.log(`    ${post.description}`);
-        console.log(`Link: ${post.url}`);
-        console.log(`=====================================`);
+    console.log(`found ${posts.length} posts for ${user.name}:`);
+    for (const post of posts) {
+        console.log(`  ${post.publishedAt}`);
+        console.log(`  ${post.title}`);
+        console.log(`  ${post.description ?? ""}`);
+        console.log(`  ${post.url}`);
+        console.log();
     }
 }

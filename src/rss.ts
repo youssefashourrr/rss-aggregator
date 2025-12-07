@@ -1,43 +1,57 @@
 import { XMLParser } from "fast-xml-parser";
 
 import { getNextFeedToFetch, markFeedFetched } from "./db/queries/feeds";
-import type { Feed, NewPost } from "./db/schema";
 import { createPost } from "./db/queries/posts";
+
+import type { Feed, NewPost } from "./db/schema";
 
 
 export type RSSFeed = {
-  channel: {
-    title: string;
-    link: string;
-    description: string;
-    item: RSSItem[];
-  };
+	channel: {
+		title: string;
+		link: string;
+		description: string;
+		item: RSSItem[];
+	};
 };
 
 export type RSSItem = {
-  title: string;
-  link: string;
-  description: string;
-  pubDate: string;
+	title: string;
+	link: string;
+	description: string;
+	pubDate: string;
+};
+
+type RSSChannel = {
+	title?: string;
+	link?: string;
+	description?: string;
+	item?: RSSItem | RSSItem[];
+};
+
+type ParsedRSS = {
+	rss?: {
+		channel?: RSSChannel;
+	};
 };
 
 
 export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
-  	const response = await fetch(feedURL, {
+  	const response: Response = await fetch(feedURL, {
     	headers: {
       		"User-Agent": "gator",
       		accept: "application/rss+xml",
     	},
   	});
   	if (!response.ok) {
-    	throw new Error(`failed to fetch feed: ${response.status}`);
+    	throw new Error(`fetch failed: ${response.status}`);
   	}
 
   	const xml: string = await response.text();
   	const parser: XMLParser = new XMLParser();
   	let result: any = parser.parse(xml);
 
-  	const channel: any = result.rss?.channel;
+  	const channel: RSSChannel | undefined = result.rss?.channel;
   	if (!channel) {
     	throw new Error("invalid feed format");
   	}
@@ -49,23 +63,23 @@ export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
     	!channel.description ||
     	!channel.item
   	) {
-    throw new Error("invalid feed format");
+    	throw new Error("invalid feed format");
   	}
 
-  	const items: any[] = Array.isArray(channel.item) ? channel.item : [channel.item];
+  	const items: (RSSItem | undefined)[] = Array.isArray(channel.item) ? channel.item : [channel.item];
 
   	const rssItems: RSSItem[] = [];
 
   	for (const item of items) {
-    	if (!item.title || !item.link || !item.description || !item.pubDate) {
+    	if (!item?.title || !item.link || !item.description || !item.pubDate) {
       		continue;
     	}
 
     	rssItems.push({
-      	title: item.title,
-      	link: item.link,
-      	description: item.description,
-      	pubDate: item.pubDate,
+      		title: item.title,
+      		link: item.link,
+      		description: item.description,
+      		pubDate: item.pubDate,
     	});
   	}
 
@@ -84,7 +98,7 @@ export async function fetchFeed(feedURL: string): Promise<RSSFeed> {
 export async function scrapFeeds(): Promise<void> {
 	const nextFeed: Feed | null = await getNextFeedToFetch();
 	if (!nextFeed) {
-		console.error("no feeds available to fetch");
+		console.log("no feeds to fetch");
 		return;
 	}
 
@@ -92,10 +106,10 @@ export async function scrapFeeds(): Promise<void> {
 
 	const fetchedRSS: RSSFeed = await fetchFeed(nextFeed.url);
 
-	for (let item of fetchedRSS.channel.item) {
-    	console.log(`Found post: %s`, item.title);
+	for (const item of fetchedRSS.channel.item) {
+    	console.log(`found post: ${item.title}`);
 
-    	const now = new Date();
+    	const now: Date = new Date();
 
 		await createPost({
 			url: item.link,
@@ -106,5 +120,5 @@ export async function scrapFeeds(): Promise<void> {
 			description: item.description,
 			publishedAt: new Date(item.pubDate),
 		} satisfies NewPost);
-  }
+  	}
 }
