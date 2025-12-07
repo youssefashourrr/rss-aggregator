@@ -1,7 +1,8 @@
 import { XMLParser } from "fast-xml-parser";
 
 import { getNextFeedToFetch, markFeedFetched } from "./db/queries/feeds";
-import type { Feed } from "./db/schema";
+import type { Feed, NewPost } from "./db/schema";
+import { createPost } from "./db/queries/posts";
 
 
 export type RSSFeed = {
@@ -91,7 +92,19 @@ export async function scrapFeeds(): Promise<void> {
 
 	const fetchedRSS: RSSFeed = await fetchFeed(nextFeed.url);
 
-	for (const item of fetchedRSS.channel.item) {
-		console.log(`* ${item.title}`);
-	}
+	for (let item of fetchedRSS.channel.item) {
+    	console.log(`Found post: %s`, item.title);
+
+    	const now = new Date();
+
+		await createPost({
+			url: item.link,
+			feedId: nextFeed.id,
+			title: item.title,
+			createdAt: now,
+			updatedAt: now,
+			description: item.description,
+			publishedAt: new Date(item.pubDate),
+		} satisfies NewPost);
+  }
 }

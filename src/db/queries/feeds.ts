@@ -5,11 +5,11 @@ import { feeds, Feed } from "../schema";
 
 
 export async function createFeed(name: string, url: string, userId: string): Promise<Feed> {
-	const [newFeed] = await db
+	const [result] = await db
 		.insert(feeds)
 		.values({ name, url, userId })
 		.returning();
-	return newFeed;
+	return result;
 }
 
 export async function getAllFeeds(): Promise<Feed[]> {

@@ -1,6 +1,6 @@
+import type { User, Feed } from "../db/schema";
 import { createFeedFollow, getFeedFollowsForUser, unfolllow } from "../db/queries/follows";
 import { getFeedByUrl } from "../db/queries/feeds";
-import type { User, Feed } from "../db/schema";
 
 
 export async function handlerFollow(cmdName: string, user: User, ...args: string[]): Promise<void> {

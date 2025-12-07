@@ -5,11 +5,11 @@ import { users, User } from "src/db/schema";
 
 
 export async function createUser(name: string): Promise<User> {
-    const [newUser] = await db
+    const [result] = await db
 		.insert(users)
 		.values({ name })
 		.returning();
-    return newUser;
+    return result;
 }
 
 export async function getAllUsers(): Promise<User[]> {
